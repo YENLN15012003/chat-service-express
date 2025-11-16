@@ -73,7 +73,7 @@ const deleteConversation = async (req, res) => {
                 type: TYPE.DELETE_CONVERSATION,
               };
               if (!user._id.equals(userId)) {
-                await Noti.insertMany([noti], { session });
+                // await Noti.insertMany([noti], { session });
               }
             })
           );

@@ -115,7 +115,7 @@ const removeMemberToGroup = async (req, res) => {
         type: TYPE.DELETE_FROM_CONVERSATION,
       };
       if (!user._id.equals(userId)) {
-        await Noti.insertMany([noti], { session });
+        // await Noti.insertMany([noti], { session });
       }
 
       const response = {
