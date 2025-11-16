@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const BaseSchema = require("./base/BaseSchema.js");
+const { v4: uuidv4 } = require("uuid");
 
 // Định nghĩa các ENUM tương ứng với enum trong Java
 const STATUS = Object.freeze({

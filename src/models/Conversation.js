@@ -79,7 +79,6 @@ const ConversationSchema = new BaseSchema(
     },
     checkDuplicate: {
       type: String,
-      default: () => uuidv4(),
       unique: true,
     },
   },

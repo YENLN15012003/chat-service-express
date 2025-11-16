@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const BaseSchema = require("./base/BaseSchema.js");
-mongoose.set("debug", true);
+const { v4: uuidv4 } = require("uuid");
 
 // Define enums
 const STATUS = Object.freeze({
