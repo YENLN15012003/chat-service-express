@@ -62,7 +62,7 @@ const sendMessageHandler = async (socket, socketEventBus) => {
         await message.save();
       }
 
-      const response = await convertMessageToLongFormat(message);
+      const response = await convertMessageToLongFormat(message, userId);
 
       socket.emit("send_message_response", {
         success: true,

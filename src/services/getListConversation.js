@@ -104,7 +104,7 @@ const getListConversation = async (req, res) => {
           id: conversation._id,
           name: conversation.view.name,
           type: conversation.type,
-          lastMessage: await convertMessageToLongFormat(lastMessage),
+          lastMessage: await convertMessageToLongFormat(lastMessage, userId),
           createdAt: conversation.createdAt,
           updatedAt: conversation.updatedAt,
         },

@@ -2,7 +2,7 @@ const { User } = require("../../models/User");
 const genPresignURL = require("../../services/genPresignURL");
 const { REACTION } = require("../../models/Message");
 
-const convertMessageToLongFormat = async (message) => {
+const convertMessageToLongFormat = async (message, userId) => {
   if (!message) return null;
 
   const [sender, attachments] = await Promise.all([
@@ -31,15 +31,15 @@ const convertMessageToLongFormat = async (message) => {
   if (message.reaction === REACTION.LIKE) {
     senderReact.type = "like";
     like.push(senderReact);
-    isILike = 1;
+    if (message.senderId.toString() === userId.toString()) isILike = 1;
   } else if (message.reaction === REACTION.DISLIKE) {
     senderReact.type = "dislike";
     dislike.push(senderReact);
-    isIDislike = 1;
+    if (message.senderId.toString() === userId.toString()) isIDislike = 1;
   } else if (message.reaction === REACTION.TYM) {
     senderReact.type = "heart";
     heart.push(senderReact);
-    isIHeart = 1;
+    if (message.senderId.toString() === userId.toString()) isIHeart = 1;
   }
 
   message.recipients.forEach((recipient) => {
@@ -52,15 +52,15 @@ const convertMessageToLongFormat = async (message) => {
     if (recipient.reaction === REACTION.LIKE) {
       receiveReact.type = "like";
       like.push(receiveReact);
-      isILike = 1;
+      if (recipient.userId.toString() === userId.toString()) isILike = 1;
     } else if (recipient.reaction === REACTION.DISLIKE) {
       receiveReact.type = "dislike";
       dislike.push(receiveReact);
-      isIDislike = 1;
+      if (recipient.userId.toString() === userId.toString()) isIDislike = 1;
     } else if (recipient.reaction === REACTION.TYM) {
       receiveReact.type = "heart";
       heart.push(receiveReact);
-      isIHeart = 1;
+      if (recipient.userId.toString() === userId.toString()) isIHeart = 1;
     }
   });
 
