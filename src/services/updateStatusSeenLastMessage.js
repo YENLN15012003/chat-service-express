@@ -42,7 +42,7 @@ const updateStatusSeenLastMessage = async (req, res) => {
     console.log("✅ Socket Event Bus initialized successfully");
 
     await Promise.all([
-      ourConversation.save(),
+      ourConversation.save({ timestamps: false }),
       socketEventBus.publish(
         "emit_seen_status_for_multi_receiver_in_multi_device",
         {
