@@ -17,7 +17,10 @@ const syncSendMessage = async (message) => {
     messageType === "image" ||
     messageType === "video" ||
     messageType === "file" ||
-    messageType === "attachment"
+    messageType === "attachment" ||
+    messageType === "add_membem_notification" ||
+    messageType === "leave_group_notification" ||
+    messageType === "remove_member_notification"
   ) {
     console.log("messageId: " + messageId);
     console.log("conversationId: " + conversationId);
