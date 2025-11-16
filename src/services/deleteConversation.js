@@ -32,7 +32,7 @@ const deleteConversation = async (req, res) => {
         myConversation.status = "invisible";
         myConversation.skipUntilOffset = new mongoose.Types.ObjectId();
 
-        await ourConversation.save();
+        await ourConversation.save({ session });
         if (
           ourConversation.type === "group" &&
           ourConversation.leaderId.equals(userId)
@@ -49,7 +49,7 @@ const deleteConversation = async (req, res) => {
                 (conversation) => !conversation._id.equals(conversationId)
               );
               //save
-              await user.save();
+              await user.save({ session });
             })
           );
           await ourConversation.deleteOne();

@@ -9,10 +9,9 @@ const handleSendNotiDeleteConversationForMuti = async (message) => {
   } else if (message.data.type === "group") {
     message.data.actionUserId.forEach((userId) => {
       global.io.to(userId.toString()).emit("deleteConversation", message);
-    });
-
-    message.data.remainMemberIds.forEach((userId) => {
-      global.io.to(userId.toString()).emit("deleteConversation", message);
+      message.data.remainMemberIds.forEach((userId) => {
+        global.io.to(userId.toString()).emit("deleteConversation", message);
+      });
     });
   }
 
