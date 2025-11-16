@@ -1,12 +1,10 @@
 const { User } = require("../models/User");
 const { Message } = require("../models/Message");
-// const Conversation = require("../models/Conversation");
-// const createPaginateResponse = require("../common/utils/createPaginateResponse");
 const {
   getMyConversationByUserIdAndConversationId,
 } = require("./getMyConversation");
 const mongoose = require("mongoose");
-const Conversation = require("../models/Conversation");
+const SynchronizePublisher = require("../messageBroker/synchronizePublisher");
 
 const reactionMessage = async (req, res) => {
   try {
@@ -46,7 +44,8 @@ const reactionMessage = async (req, res) => {
 
     await message.save();
     // // Tạo kết quả phân trang
-    return res.json({
+
+    const response = {
       success: true,
       status: 200,
       message: "Reaction message successfully",
@@ -60,7 +59,21 @@ const reactionMessage = async (req, res) => {
           updatedAt: message.reactedAt,
         },
       },
-    });
+    };
+
+    // Khởi tạo SocketEventBus & emit su kien co nguoi doc tin nhan
+    const synchronizePublisher = await SynchronizePublisher.getInstance();
+    // Publish lên Redis Stream
+    const event = {
+      destination: "sync-stream",
+      payload: JSON.stringify({
+        eventType: "NEW_REACTION",
+        ...response,
+      }),
+    };
+    await synchronizePublisher.publish(event);
+
+    return res.json(response);
   } catch (error) {
     console.error(error);
     res.json({

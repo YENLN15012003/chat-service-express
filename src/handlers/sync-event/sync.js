@@ -14,6 +14,7 @@ const handleSendNotiDeleteMemberGroupForMuti = require("../socket-event-bus/hand
 const handleSendNotiLeaveGroupForMuti = require("../socket-event-bus/handleSendNotiLeaveGroupForMuti");
 const handleSendNotiDeleteConversationForMuti = require("../socket-event-bus/handleSendNotiDeleteConversationForMuti");
 const handleTyping = require("../socket-event-bus/handleTyping");
+const handleNewReaction = require("../socket-event-bus/handleNewReaction");
 
 const sync = async (message) => {
   try {
@@ -88,6 +89,9 @@ const sync = async (message) => {
         await handleTyping(data);
         break;
 
+      case "NEW_REACTION":
+        await handleNewReaction(data);
+        break;
       default:
         console.log("NOT FOUND CURRENT EVENT TYPE: " + eventType);
     }
