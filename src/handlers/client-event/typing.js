@@ -1,5 +1,4 @@
 const { default: mongoose } = require("mongoose");
-const SynchronizePublisher = require("../../messageBroker/synchronizePublisher");
 const Conversation = require("../../models/Conversation");
 
 const typing = async (socket, socketEventBus) => {
@@ -18,16 +17,10 @@ const typing = async (socket, socketEventBus) => {
       );
       if (!ourConversation) throw new Error("CONVERSATION NOT EXIST");
 
-      const synchronizePublisher = await SynchronizePublisher.getInstance();
-      const event = {
-        destination: "sync-stream",
-        payload: JSON.stringify({
-          eventType: "TYPING",
-          ourConversation,
-          email,
-        }),
-      };
-      await synchronizePublisher.publish(event);
+      const socketEventBus =
+        await require("../handlers/socket-event-bus").getInstance();
+      console.log("✅ Socket Event Bus initialized successfully");
+      await socketEventBus.publish("TYPING", response);
     } catch (error) {
       console.error(error);
       socket.emit("send_message_response", {

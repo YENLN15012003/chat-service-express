@@ -1,12 +1,10 @@
 const { User } = require("../models/User");
 const { Message } = require("../models/Message");
-const Conversation = require("../models/Conversation");
 const mongoose = require("mongoose");
 const withTransactionThrow = require("../common/utils/withTransactionThrow");
 const {
   getMyConversationByUserIdAndConversationId,
 } = require("./getMyConversation");
-const SynchronizePublisher = require("../messageBroker/synchronizePublisher");
 
 const leaveGroup = async (req, res) => {
   return await withTransactionThrow(
@@ -144,16 +142,10 @@ const leaveGroup = async (req, res) => {
         },
       };
 
-      const synchronizePublisher = await SynchronizePublisher.getInstance();
-      // Publish lên Redis Stream
-      const event = {
-        destination: "sync-stream",
-        payload: JSON.stringify({
-          eventType: "LEAVE_GROUP",
-          ...response,
-        }),
-      };
-      await synchronizePublisher.publish(event);
+      const socketEventBus =
+        await require("../handlers/socket-event-bus").getInstance();
+      console.log("✅ Socket Event Bus initialized successfully");
+      await socketEventBus.publish("LEAVE_GROUP", response);
 
       return res.json(response);
     },

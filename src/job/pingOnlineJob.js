@@ -23,7 +23,7 @@ const pingOnlineJob = () => {
     } catch (err) {
       console.error("Lỗi khi gửi broadcast:", err);
     }
-  }, 5000); // 5 giây
+  }, 20000); // 20 giây
 };
 
 module.exports = pingOnlineJob;

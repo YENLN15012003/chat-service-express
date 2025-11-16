@@ -4,7 +4,6 @@ const Conversation = require("../models/Conversation");
 const withTransactionThrow = require("../common/utils/withTransactionThrow");
 const { getMyConversationFromOurConversation } = require("./getMyConversation");
 const convertUserToLongFormat = require("../common/utils/convertUserToLongFormat");
-const SynchronizePublisher = require("../messageBroker/synchronizePublisher");
 
 const createGroup = async (req, res) => {
   return await withTransactionThrow(
@@ -150,17 +149,10 @@ const createGroup = async (req, res) => {
         },
       };
 
-      // Khởi tạo SocketEventBus & emit su kien co nguoi doc tin nhan
-      const synchronizePublisher = await SynchronizePublisher.getInstance();
-      // Publish lên Redis Stream
-      const event = {
-        destination: "sync-stream",
-        payload: JSON.stringify({
-          eventType: "CREATE_GROUP",
-          ...response,
-        }),
-      };
-      await synchronizePublisher.publish(event);
+      const socketEventBus =
+        await require("../handlers/socket-event-bus").getInstance();
+      console.log("✅ Socket Event Bus initialized successfully");
+      await socketEventBus.publish("CREATE_GROUP", response);
 
       return res.json(response);
     },

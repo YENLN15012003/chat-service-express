@@ -1,10 +1,7 @@
 const { User } = require("../models/User");
 const { Message } = require("../models/Message");
-const {
-  getMyConversationByUserIdAndConversationId,
-} = require("./getMyConversation");
+
 const mongoose = require("mongoose");
-const SynchronizePublisher = require("../messageBroker/synchronizePublisher");
 
 const reactionMessage = async (req, res) => {
   try {
@@ -61,17 +58,10 @@ const reactionMessage = async (req, res) => {
       },
     };
 
-    // Khởi tạo SocketEventBus & emit su kien co nguoi doc tin nhan
-    const synchronizePublisher = await SynchronizePublisher.getInstance();
-    // Publish lên Redis Stream
-    const event = {
-      destination: "sync-stream",
-      payload: JSON.stringify({
-        eventType: "NEW_REACTION",
-        ...response,
-      }),
-    };
-    await synchronizePublisher.publish(event);
+    const socketEventBus =
+      await require("../handlers/socket-event-bus").getInstance();
+    console.log("✅ Socket Event Bus initialized successfully");
+    await socketEventBus.publish("NEW_REACTION", response);
 
     return res.json(response);
   } catch (error) {

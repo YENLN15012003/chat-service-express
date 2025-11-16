@@ -1,12 +1,18 @@
 const { User } = require("../models/User");
 const { Message } = require("../models/Message");
-const Conversation = require("../models/Conversation");
 const mongoose = require("mongoose");
 const withTransactionThrow = require("../common/utils/withTransactionThrow");
 const {
   getMyConversationByUserIdAndConversationId,
 } = require("./getMyConversation");
-const SynchronizePublisher = require("../messageBroker/synchronizePublisher");
+const {
+  Noti,
+  SENDER_TYPE,
+  RECEIVER_TYPE,
+  REFERENCE_TYPE,
+  STATUS,
+  TYPE,
+} = require("../models/Noti");
 
 const removeMemberToGroup = async (req, res) => {
   return await withTransactionThrow(
@@ -95,6 +101,23 @@ const removeMemberToGroup = async (req, res) => {
 
       await userMember.save({ session });
 
+      // sent noti
+      const noti = {
+        content:
+          "You are remove from conversation X " + myConversation.view.name,
+        senderEmail: SENDER_TYPE.SYSTEM,
+        senderType: SENDER_TYPE.SYSTEM,
+        receiverEmail: userMember.email,
+        receiverType: RECEIVER_TYPE.USER,
+        referenceType: REFERENCE_TYPE.CONVERSATION,
+        referenceEmail: myConversation.view.name,
+        status: STATUS.NOT_SEEN,
+        type: TYPE.DELETE_FROM_CONVERSATION,
+      };
+      if (!user._id.equals(userId)) {
+        await Noti.insertMany([noti], { session });
+      }
+
       const response = {
         success: true,
         status: 200,
@@ -148,18 +171,10 @@ const removeMemberToGroup = async (req, res) => {
             .map((member) => member._id),
         },
       };
-
-      // Khởi tạo SocketEventBus & emit su kien co nguoi doc tin nhan
-      const synchronizePublisher = await SynchronizePublisher.getInstance();
-      // Publish lên Redis Stream
-      const event = {
-        destination: "sync-stream",
-        payload: JSON.stringify({
-          eventType: "DELETE_MEMBER_FROM_GROUP",
-          ...response,
-        }),
-      };
-      await synchronizePublisher.publish(event);
+      const socketEventBus =
+        await require("../handlers/socket-event-bus").getInstance();
+      console.log("✅ Socket Event Bus initialized successfully");
+      await socketEventBus.publish("DELETE_MEMBER_FROM_GROUP", response);
 
       return res.json(response);
     },

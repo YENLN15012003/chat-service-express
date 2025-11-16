@@ -15,6 +15,7 @@ const SENDER_TYPE = Object.freeze({
 
 const REFERENCE_TYPE = Object.freeze({
   USER: "USER",
+  CONVERSATION: "CONVERSATION",
 });
 
 const RECEIVER_TYPE = Object.freeze({
@@ -24,6 +25,8 @@ const RECEIVER_TYPE = Object.freeze({
 
 const TYPE = Object.freeze({
   ACCEPT_FRIEND_REQUEST: "ACCEPT_FRIEND_REQUEST",
+  DELETE_CONVERSATION: "DELETE_CONVERSATION",
+  DELETE_FROM_CONVERSATION: "DELETE_FROM_CONVERSATION",
 });
 
 const NotiSchema = new BaseSchema(

@@ -4,7 +4,14 @@ const {
 } = require("./getMyConversation");
 const mongoose = require("mongoose");
 const withTransactionThrow = require("../common/utils/withTransactionThrow");
-const SynchronizePublisher = require("../messageBroker/synchronizePublisher");
+const {
+  Noti,
+  SENDER_TYPE,
+  RECEIVER_TYPE,
+  REFERENCE_TYPE,
+  STATUS,
+  TYPE,
+} = require("../models/Noti");
 
 const deleteConversation = async (req, res) => {
   return await withTransactionThrow(
@@ -50,9 +57,27 @@ const deleteConversation = async (req, res) => {
               );
               //save
               await user.save({ session });
+
+              // sent noti
+              const noti = {
+                content:
+                  "Leader of conversation deleted conversation " +
+                  myConversation.view.name,
+                senderEmail: SENDER_TYPE.SYSTEM,
+                senderType: SENDER_TYPE.SYSTEM,
+                receiverEmail: user.email,
+                receiverType: RECEIVER_TYPE.USER,
+                referenceType: REFERENCE_TYPE.CONVERSATION,
+                referenceEmail: myConversation.view.name,
+                status: STATUS.NOT_SEEN,
+                type: TYPE.DELETE_CONVERSATION,
+              };
+              if (!user._id.equals(userId)) {
+                await Noti.insertMany([noti], { session });
+              }
             })
           );
-          await ourConversation.deleteOne();
+          await ourConversation.deleteOne({ session });
         }
         const response = {
           success: true,
@@ -86,16 +111,10 @@ const deleteConversation = async (req, res) => {
           },
         };
 
-        const synchronizePublisher = await SynchronizePublisher.getInstance();
-        // Publish lên Redis Stream
-        const event = {
-          destination: "sync-stream",
-          payload: JSON.stringify({
-            eventType: "DELETE_CONVERSATION",
-            ...response,
-          }),
-        };
-        await synchronizePublisher.publish(event);
+        const socketEventBus =
+          await require("../handlers/socket-event-bus").getInstance();
+        console.log("✅ Socket Event Bus initialized successfully");
+        await socketEventBus.publish("DELETE_CONVERSATION", response);
 
         // // Tạo kết quả phân trang
         return res.json(response);

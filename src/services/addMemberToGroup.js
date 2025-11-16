@@ -1,13 +1,11 @@
 const { User } = require("../models/User");
 const { Message } = require("../models/Message");
-const Conversation = require("../models/Conversation");
 const mongoose = require("mongoose");
 const withTransactionThrow = require("../common/utils/withTransactionThrow");
 const {
   getMyConversationByUserIdAndConversationId,
 } = require("./getMyConversation");
 const convertUserToLongFormat = require("../common/utils/convertUserToLongFormat");
-const SynchronizePublisher = require("../messageBroker/synchronizePublisher");
 
 const addMemberToGroup = async (req, res) => {
   return await withTransactionThrow(
@@ -182,17 +180,10 @@ const addMemberToGroup = async (req, res) => {
         },
       };
 
-      // Khởi tạo SocketEventBus & emit su kien co nguoi doc tin nhan
-      const synchronizePublisher = await SynchronizePublisher.getInstance();
-      // Publish lên Redis Stream
-      const event = {
-        destination: "sync-stream",
-        payload: JSON.stringify({
-          eventType: "ADD_MEMBER_TO_GROUP",
-          ...response,
-        }),
-      };
-      await synchronizePublisher.publish(event);
+      const socketEventBus =
+        await require("../handlers/socket-event-bus").getInstance();
+      console.log("✅ Socket Event Bus initialized successfully");
+      await socketEventBus.publish("ADD_MEMBER_TO_GROUP", response);
 
       return res.json(response);
     },
