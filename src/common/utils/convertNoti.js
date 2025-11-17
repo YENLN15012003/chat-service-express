@@ -5,6 +5,8 @@ const convertNoti = async (noti) => {
   switch (noti.type) {
     case TYPE.ACCEPT_FRIEND_REQUEST:
       return converNotiAcceptFriend(noti);
+    default:
+      console.log("NO MATCH TYPE");
   }
 };
 
