@@ -1,5 +1,6 @@
 const SynchronizePublisher = require("../messageBroker/synchronizePublisher");
 const { Message } = require("../models/Message");
+const { Noti } = require("../models/Noti");
 const ResumeToken = require("../models/resumeToken");
 
 class EventChangeStreamService {
@@ -63,8 +64,34 @@ class EventChangeStreamService {
 
       // Tạo change stream
       const changeStream = Message.watch(pipeline, options);
+      const notiChange = Noti.watch(pipeline, {});
 
       console.log("👀 Change Stream started, watching events collection...");
+
+      // Lắng nghe các thay đổi
+      notiChange.on("change", async (change) => {
+        try {
+          await this.handleChangeNoti(change);
+
+        } catch (error) {
+          console.error("❌ Error handling change:", error);
+        }
+      });
+
+      // Xử lý lỗi
+      notiChange.on("error", async (error) => {
+        console.error("❌ Change Stream error:", error);
+
+        // Tự động restart sau 5 giây
+        setTimeout(() => {
+          console.log("🔄 Restarting Change Stream...");
+          this.start();
+        }, 5000);
+      });
+
+      notiChange.on("close", () => {
+        console.log("⚠️ Change Stream closed");
+      });
 
       // Lắng nghe các thay đổi
       changeStream.on("change", async (change) => {
@@ -112,6 +139,29 @@ class EventChangeStreamService {
         destination: "sync-stream",
         payload: JSON.stringify({
           eventType: "SYNC_SEND_MESSAGE",
+          ...fullDocument,
+        }),
+      };
+      await this.synchronizePublisher.publish(event);
+
+      console.log(
+        `✅ Event ${fullDocument._id} processed and sent at ${new Date()}`
+      );
+    } catch (error) {
+      console.error(`❌ Error processing event ${fullDocument._id}:`, error);
+      throw error;
+    }
+  }
+   async handleChangeNoti(change) {
+    console.log("new noti in Noti Collections");
+    const { fullDocument } = change;
+
+    try {
+      // Publish lên Redis Stream
+      const event = {
+        destination: "sync-stream",
+        payload: JSON.stringify({
+          eventType: "NEW_NOTI",
           ...fullDocument,
         }),
       };

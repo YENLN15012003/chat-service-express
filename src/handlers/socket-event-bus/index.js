@@ -14,6 +14,7 @@ const handleSendNotiLeaveGroupForMuti = require("./handleSendNotiLeaveGroupForMu
 const handleSendNotiDeleteConversationForMuti = require("./handleSendNotiDeleteConversationForMuti");
 const handleTyping = require("./handleTyping");
 const handleNewReaction = require("./handleNewReaction");
+const handleNewNoti = require("./handleNewNoti");
 
 // DON'T TOUCH
 class SocketEventBus {
@@ -117,6 +118,9 @@ class SocketEventBus {
     });
     this.subClient.subscribe("NEW_REACTION", async (message) => {
       await handleNewReaction(JSON.parse(message));
+    });
+    this.subClient.subscribe("NEW_NOTI", async (message) => {
+      await handleNewNoti(JSON.parse(message));
     });
   }
 }

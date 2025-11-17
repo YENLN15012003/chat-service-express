@@ -1,7 +1,6 @@
 const { User } = require("../models/User");
-const getFullUserInfo = require("./getFullUserInfor");
 const { Noti, STATUS } = require("../models/Noti");
-// const convertUserToLongFormat = require("../common/utils/convertUserToLongFormat");
+const convertNoti = require("../common/utils/convertNoti");
 const getNotification = async (req, res) => {
   try {
     console.log("\nstart-get-list-noti \n"); // In ra console server
@@ -31,20 +30,7 @@ const getNotification = async (req, res) => {
 
     const notificationPromises = notifications
       .slice(skip, Math.min(skip + pageSize, notifications.length))
-      .map(async (noti) => {
-        const userReferenceEmail = noti.referenceEmail;
-        const userReference = await getFullUserInfo(req, userReferenceEmail);
-        console.log("ssssss: ", userReference);
-        return {
-          id: noti._id,
-          content: noti.content,
-          status: noti.status,
-          type: noti.type,
-          createdAt: noti.createdAt,
-          seenAt: noti.seenAt,
-          userReference,
-        };
-      });
+      .map(async (noti) => await convertNoti(noti));
 
     const records = await Promise.all(notificationPromises);
     const totalItems = +notifications.length;

@@ -53,6 +53,10 @@ const sync = async (message) => {
         await syncNoti(data);
         break;
 
+      case "NEW_NOTI":
+        await socketEventBus.publish("NEW_NOTI", data);
+        break;
+
       default:
         console.log("NOT FOUND CURRENT EVENT TYPE: " + eventType);
     }

@@ -2,6 +2,7 @@ const { User } = require("../models/User");
 const getFullUserInfo = require("./getFullUserInfor");
 const { Noti, STATUS } = require("../models/Noti");
 const mongoose = require("mongoose");
+const convertNoti = require("../common/utils/convertNoti");
 
 const changeStatusNoti = async (req, res) => {
   try {
@@ -39,17 +40,7 @@ const changeStatusNoti = async (req, res) => {
 
     await noti.save();
 
-    const userReferenceEmail = noti.referenceEmail;
-    const userReference = await getFullUserInfo(req, userReferenceEmail);
-
-    return res.json({
-      id: noti._id,
-      content: noti.content,
-      status: noti.status,
-      seenAt: noti.seenAt,
-      createdAt: noti.createdAt,
-      userReference,
-    });
+    return res.json(await convertNoti(noti));
   } catch (error) {
     console.error(error);
     return res.json({
