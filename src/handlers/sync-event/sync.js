@@ -7,7 +7,7 @@ const syncNoti = require("./syncNoti");
 const sync = async (message) => {
   try {
     const { eventType, ...data } = message;
-
+    const socketEventBus = await require("../socket-event-bus").getInstance();
     switch (eventType) {
       case "SYNC_USER":
         await syncUser(data);
@@ -27,6 +27,26 @@ const sync = async (message) => {
 
       case "TEST":
         console.log("WOWWWWWWWW____TESTTTTTTT: ", data);
+        break;
+
+      case "RECEIVE_FRIEND_REQUEST":
+        await socketEventBus.publish("RECEIVE_FRIEND_REQUEST", data);
+        break;
+
+      case "CANCEL_FRIEND_REQUEST":
+        await socketEventBus.publish("CANCEL_FRIEND_REQUEST", data);
+        break;
+
+      case "DELETE_FRIEND":
+        await socketEventBus.publish("DELETE_FRIEND", data);
+        break;
+
+      case "REJECT_FRIEND_REQUEST":
+        await socketEventBus.publish("REJECT_FRIEND_REQUEST", data);
+        break;
+
+      case "ACCEPT_FRIEND_REQUEST":
+        await socketEventBus.publish("ACCEPT_FRIEND_REQUEST", data);
         break;
 
       case "NOTI":
