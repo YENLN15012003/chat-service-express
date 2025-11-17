@@ -60,9 +60,7 @@ const deleteConversation = async (req, res) => {
 
               // sent noti
               const noti = {
-                content:
-                  "Leader of conversation deleted conversation " +
-                  myConversation.view.name,
+                content: ourConversation._id + ";" + myConversation.view.name,
                 senderEmail: SENDER_TYPE.SYSTEM,
                 senderType: SENDER_TYPE.SYSTEM,
                 receiverEmail: user.email,
@@ -73,11 +71,10 @@ const deleteConversation = async (req, res) => {
                 type: TYPE.DELETE_CONVERSATION,
               };
               if (!user._id.equals(userId)) {
-                // await Noti.insertMany([noti], { session });
+                await Noti.insertMany([noti], { session });
               }
             })
           );
-          await ourConversation.deleteOne({ session });
         }
         const response = {
           success: true,
