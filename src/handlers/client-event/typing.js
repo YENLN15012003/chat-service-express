@@ -18,7 +18,7 @@ const typing = async (socket, socketEventBus) => {
       if (!ourConversation) throw new Error("CONVERSATION NOT EXIST");
 
       const socketEventBus =
-        await require("../handlers/socket-event-bus").getInstance();
+        await require("../../handlers/socket-event-bus").getInstance();
       console.log("✅ Socket Event Bus initialized successfully");
       await socketEventBus.publish("TYPING", response);
     } catch (error) {
@@ -26,7 +26,7 @@ const typing = async (socket, socketEventBus) => {
       socket.emit("send_message_response", {
         success: false,
         status: 400,
-        message: "Ping online fail because " + error.message,
+        message: "typing fail because " + error.message,
       });
     }
   });
