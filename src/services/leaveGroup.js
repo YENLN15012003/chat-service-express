@@ -5,6 +5,7 @@ const withTransactionThrow = require("../common/utils/withTransactionThrow");
 const {
   getMyConversationByUserIdAndConversationId,
 } = require("./getMyConversation");
+const sentMessageAsNoti = require("../common/utils/sentMessageAsNoti");
 
 const leaveGroup = async (req, res) => {
   return await withTransactionThrow(
@@ -146,6 +147,13 @@ const leaveGroup = async (req, res) => {
         await require("../handlers/socket-event-bus").getInstance();
       console.log("✅ Socket Event Bus initialized successfully");
       await socketEventBus.publish("LEAVE_GROUP", response);
+
+      await sentMessageAsNoti(
+        user,
+        id,
+        socketEventBus,
+        "leave_group_notification"
+      );
 
       return res.json(response);
     },
