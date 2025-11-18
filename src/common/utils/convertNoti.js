@@ -12,6 +12,9 @@ const convertNoti = async (noti) => {
     case TYPE.DELETE_CONVERSATION:
       return converNotiDeleteConverstion(noti);
 
+    case TYPE.DELETE_FROM_CONVERSATION:
+      return converNotiDeleteFromConverstion(noti);
+
     default:
       console.log("NO MATCH TYPE");
       return { error: "NO MATCH TYPE" };
@@ -34,6 +37,32 @@ const converNotiAcceptFriend = async (noti) => {
   };
 };
 const converNotiDeleteConverstion = async (noti) => {
+  const [conversationId, name] = noti.content.split(";");
+
+  const ourConversation = await Conversation.findById(
+    new mongoose.Types.ObjectId(conversationId)
+  );
+  if (!ourConversation) throw new Error("NOT FOUND CONVERSATION TO CONVERT");
+  const myConversation = ourConversation.participants[0];
+
+  const avatarPromises = myConversation.view.avatar.map(async (avatar) => {
+    return await genPresignURL(avatar.value);
+  });
+  const avatars = await Promise.all(avatarPromises);
+
+  return {
+    id: noti._id,
+    content: conversationId + ";" + name + ";" + avatars.join(";"),
+    contentExplain:
+      "conversationId;conversationName;listAvatar(maximum = 3 =>  may be 1,2 elements)",
+    status: noti.status,
+    type: noti.type,
+    createdAt: noti.createdAt,
+    seenAt: noti.seenAt,
+  };
+};
+
+const converNotiDeleteFromConverstion = async (noti) => {
   const [conversationId, name] = noti.content.split(";");
 
   const ourConversation = await Conversation.findById(

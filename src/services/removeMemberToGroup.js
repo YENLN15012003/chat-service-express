@@ -103,8 +103,7 @@ const removeMemberToGroup = async (req, res) => {
 
       // sent noti
       const noti = {
-        content:
-          "You are remove from conversation X " + myConversation.view.name,
+        content: ourConversation._id + ";" + myConversation.view.name,
         senderEmail: SENDER_TYPE.SYSTEM,
         senderType: SENDER_TYPE.SYSTEM,
         receiverEmail: userMember.email,
@@ -114,9 +113,8 @@ const removeMemberToGroup = async (req, res) => {
         status: STATUS.NOT_SEEN,
         type: TYPE.DELETE_FROM_CONVERSATION,
       };
-      if (!user._id.equals(userId)) {
-        // await Noti.insertMany([noti], { session });
-      }
+
+      await Noti.insertMany([noti], { session });
 
       const response = {
         success: true,
