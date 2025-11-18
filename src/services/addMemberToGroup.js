@@ -188,7 +188,12 @@ const addMemberToGroup = async (req, res) => {
       await socketEventBus.publish("ADD_MEMBER_TO_GROUP", response);
       await Promise.all([
         users.forEach(async (user) => {
-          await sentMessageAsNoti(user, id, socketEventBus);
+          await sentMessageAsNoti(
+            user,
+            id,
+            socketEventBus,
+            "add_member_group_notification"
+          );
         }),
       ]);
 

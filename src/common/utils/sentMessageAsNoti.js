@@ -4,7 +4,12 @@ const { Message } = require("../../models/Message");
 const convertMessageToLongFormat = require("./convertMessageToLongFormat");
 // const { User } = require("../../models/User");
 
-const sentMessageAsNoti = async (userInfluenced, converId, socketEventBus) => {
+const sentMessageAsNoti = async (
+  userInfluenced,
+  converId,
+  socketEventBus,
+  messageType
+) => {
   console.log("sentMessageAsNoti..........");
 
   try {
@@ -36,7 +41,7 @@ const sentMessageAsNoti = async (userInfluenced, converId, socketEventBus) => {
         };
       }),
       content: userInfluenced.fullName,
-      type: "notification",
+      type: messageType,
       status: "CONFIRMED",
     });
 

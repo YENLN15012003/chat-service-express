@@ -50,7 +50,13 @@ const MessageSchema = new BaseSchema(
     content: String,
     type: {
       type: String,
-      enum: ["text", "attachment", "notification"],
+      enum: [
+        "text",
+        "attachment",
+        "add_member_group_notification",
+        "kick_member_group_notification",
+        "leave_group_notification",
+      ],
       default: "text",
     },
 
