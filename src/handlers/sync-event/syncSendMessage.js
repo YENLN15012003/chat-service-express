@@ -18,9 +18,7 @@ const syncSendMessage = async (message) => {
     messageType === "video" ||
     messageType === "file" ||
     messageType === "attachment" ||
-    messageType === "add_membem_notification" ||
-    messageType === "leave_group_notification" ||
-    messageType === "remove_member_notification"
+    messageType === "notification"
   ) {
     console.log("messageId: " + messageId);
     console.log("conversationId: " + conversationId);

@@ -20,6 +20,10 @@ const typing = async (socket, socketEventBus) => {
       const socketEventBus =
         await require("../../handlers/socket-event-bus").getInstance();
       console.log("✅ Socket Event Bus initialized successfully");
+      const response = {
+        email,
+        ourConversation,
+      };
       await socketEventBus.publish("TYPING", response);
     } catch (error) {
       console.error(error);

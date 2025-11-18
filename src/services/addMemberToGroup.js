@@ -6,11 +6,17 @@ const {
   getMyConversationByUserIdAndConversationId,
 } = require("./getMyConversation");
 const convertUserToLongFormat = require("../common/utils/convertUserToLongFormat");
+const sentMessageAsNoti = require("../common/utils/sentMessageAsNoti");
 
 const addMemberToGroup = async (req, res) => {
   return await withTransactionThrow(
     async (session, req, res) => {
       console.log("\nstart-create-group\n"); // In ra console server
+
+      const socketEventBus =
+        await require("../handlers/socket-event-bus").getInstance();
+      console.log("✅ Socket Event Bus initialized successfully");
+
       const { memberEmails } = req.body;
       const { id } = req.params;
       const conversationId = new mongoose.Types.ObjectId(id);
@@ -33,7 +39,6 @@ const addMemberToGroup = async (req, res) => {
           });
 
           if (!res) throw new Error("USER NOT FOUND WITH ID: " + memberId);
-
           return res;
         })
       );
@@ -180,10 +185,12 @@ const addMemberToGroup = async (req, res) => {
         },
       };
 
-      const socketEventBus =
-        await require("../handlers/socket-event-bus").getInstance();
-      console.log("✅ Socket Event Bus initialized successfully");
       await socketEventBus.publish("ADD_MEMBER_TO_GROUP", response);
+      await Promise.all([
+        users.forEach(async (user) => {
+          await sentMessageAsNoti(user, id, socketEventBus);
+        }),
+      ]);
 
       return res.json(response);
     },
