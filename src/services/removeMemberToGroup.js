@@ -13,6 +13,7 @@ const {
   STATUS,
   TYPE,
 } = require("../models/Noti");
+const sentMessageAsNoti = require("../common/utils/sentMessageAsNoti");
 
 const removeMemberToGroup = async (req, res) => {
   return await withTransactionThrow(
@@ -173,6 +174,12 @@ const removeMemberToGroup = async (req, res) => {
         await require("../handlers/socket-event-bus").getInstance();
       console.log("✅ Socket Event Bus initialized successfully");
       await socketEventBus.publish("DELETE_MEMBER_FROM_GROUP", response);
+      await sentMessageAsNoti(
+        userMember,
+        id,
+        socketEventBus,
+        "kick_member_group_notification"
+      );
 
       return res.json(response);
     },
