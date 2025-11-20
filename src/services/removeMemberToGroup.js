@@ -176,7 +176,7 @@ const removeMemberToGroup = async (req, res) => {
       await socketEventBus.publish("DELETE_MEMBER_FROM_GROUP", response);
       await sentMessageAsNoti(
         userMember,
-        id,
+        ourConversation,
         socketEventBus,
         "kick_member_group_notification"
       );

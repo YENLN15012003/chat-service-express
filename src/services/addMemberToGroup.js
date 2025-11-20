@@ -190,7 +190,7 @@ const addMemberToGroup = async (req, res) => {
         users.forEach(async (user) => {
           await sentMessageAsNoti(
             user,
-            id,
+            ourConversation,
             socketEventBus,
             "add_member_group_notification"
           );

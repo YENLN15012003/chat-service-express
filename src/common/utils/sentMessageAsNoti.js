@@ -1,12 +1,11 @@
 const mongoose = require("mongoose");
-const Conversation = require("../../models/Conversation");
 const { Message } = require("../../models/Message");
 const convertMessageToLongFormat = require("./convertMessageToLongFormat");
 // const { User } = require("../../models/User");
 
 const sentMessageAsNoti = async (
   userInfluenced,
-  converId,
+  conversation,
   socketEventBus,
   messageType
 ) => {
@@ -14,16 +13,6 @@ const sentMessageAsNoti = async (
 
   try {
     const userId = new mongoose.Types.ObjectId(userInfluenced._id);
-
-    const conversationId = new mongoose.Types.ObjectId(converId);
-    console.log("conversationId: ", JSON.stringify(conversationId, null, 2));
-
-    // get Conversation
-    const conversation = await Conversation.findById(conversationId);
-
-    if (!conversation)
-      throw new Error(`Conversation with id: ${conversationId} dont exists.`);
-    console.log("conversation: ", JSON.stringify(conversation, null, 2));
 
     const participantIds = conversation.participants.map(
       (participant) => participant.userId
@@ -34,7 +23,7 @@ const sentMessageAsNoti = async (
 
     const message = await Message.create({
       senderId: userId,
-      conversationId,
+      conversationId: conversation._id,
       recipients: participantIds.map((recipientId) => {
         return {
           userId: recipientId,

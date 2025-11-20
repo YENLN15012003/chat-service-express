@@ -150,7 +150,7 @@ const leaveGroup = async (req, res) => {
 
       await sentMessageAsNoti(
         user,
-        id,
+        ourConversation,
         socketEventBus,
         "leave_group_notification"
       );
