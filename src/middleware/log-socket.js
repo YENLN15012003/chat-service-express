@@ -21,6 +21,12 @@ const getSocketIP = (socket) => {
  * Ghi log socket vào file theo ngày
  */
 const writeSocketLog = (logData) => {
+  if (process.env.WRITE_LOG === "0") {
+    console.log("Off write log");
+    return;
+  }
+  console.log("start---write---log");
+
   try {
     const projectRoot = process.cwd();
     const logsDir = path.join(projectRoot, "logs", "socket");
@@ -83,9 +89,9 @@ const wrapSocketHandler = (socket, event, handler, clientIP) => {
     // Gọi handler gốc
     try {
       const result = handler.apply(this, args);
-      
+
       // Nếu handler return promise, catch error
-      if (result && typeof result.then === 'function') {
+      if (result && typeof result.then === "function") {
         return result.catch((error) => {
           writeSocketLog({
             ip: clientIP,
@@ -99,7 +105,7 @@ const wrapSocketHandler = (socket, event, handler, clientIP) => {
           throw error;
         });
       }
-      
+
       return result;
     } catch (error) {
       // Log nếu handler bị lỗi
@@ -149,7 +155,11 @@ const socketLoggerMiddleware = (socket, next) => {
   const originalEmit = socket.emit.bind(socket);
   socket.emit = function (event, ...args) {
     // Không log các internal events của socket.io
-    if (!event.startsWith('$') && event !== 'newListener' && event !== 'removeListener') {
+    if (
+      !event.startsWith("$") &&
+      event !== "newListener" &&
+      event !== "removeListener"
+    ) {
       writeSocketLog({
         ip: clientIP,
         socketId: socket.id,

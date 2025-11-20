@@ -185,7 +185,6 @@ const addMemberToGroup = async (req, res) => {
         },
       };
 
-      await socketEventBus.publish("ADD_MEMBER_TO_GROUP", response);
       await Promise.all([
         users.map(async (user) => {
           await sentMessageAsNoti(
@@ -196,6 +195,8 @@ const addMemberToGroup = async (req, res) => {
           );
         }),
       ]);
+
+      await socketEventBus.publish("ADD_MEMBER_TO_GROUP", response);
 
       return res.json(response);
     },
