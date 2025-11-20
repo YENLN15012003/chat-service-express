@@ -187,7 +187,7 @@ const addMemberToGroup = async (req, res) => {
 
       await socketEventBus.publish("ADD_MEMBER_TO_GROUP", response);
       await Promise.all([
-        users.forEach(async (user) => {
+        users.map(async (user) => {
           await sentMessageAsNoti(
             user,
             ourConversation,
