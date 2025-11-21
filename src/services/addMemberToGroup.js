@@ -197,7 +197,7 @@ const addMemberToGroup = async (req, res) => {
       ]);
 
       await socketEventBus.publish("ADD_MEMBER_TO_GROUP", response);
-
+      console.log("done: " + new Date());
       return res.json(response);
     },
     req,
