@@ -54,7 +54,7 @@ const getDetailConversationByFriend = async (req, res) => {
           $lt: skipUntilOffset,
         },
         conversationId,
-        status: "CONFIRMED",
+        // status: "CONFIRMED",
       }); // Sắp xếp giảm dần theo thời gian tạo
     }
     console.log("messages: ", messages);
