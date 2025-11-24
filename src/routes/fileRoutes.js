@@ -23,7 +23,7 @@ router.post("/chats/upload", upload.array("files", 10), async (req, res) => {
   res.json(
     await uploadFileService.uploadFile(
       req.files,
-      S3_CONSTANTS.CHAT_MEDIA_BUCKET,
+      S3_CONSTANTS.AVATAR_PRIVATE_BUCKET,
       req.currentUser.email,
       req.body
     )
