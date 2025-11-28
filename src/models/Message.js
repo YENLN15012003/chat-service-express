@@ -53,6 +53,7 @@ const MessageSchema = new BaseSchema(
       enum: [
         "text",
         "attachment",
+        "voice",
         "add_member_group_notification",
         "kick_member_group_notification",
         "leave_group_notification",
