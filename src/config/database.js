@@ -3,7 +3,10 @@ const mongoose = require('mongoose');
 const connectDB = async () => {
     try {
         // Kết nối đến MongoDB server port 30000
-        const conn = await mongoose.connect(process.env.MONGODB_URI);
+        const conn = await mongoose.connect(process.env.MONGODB_URI, {
+            readPreference: 'secondaryPreferred',
+            maxStalenessSeconds: 90
+        });
 
         console.log(`✅ MongoDB Connected: ${conn.connection.host}:${conn.connection.port}`);
         console.log(`📊 Database Name: ${conn.connection.name}`);
